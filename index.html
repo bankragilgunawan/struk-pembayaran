@@ -1,0 +1,378 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Struk Pembayaran Pro</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f2f2f2;
+  }
+  header {
+    background: #007aff;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .watermark-email {
+  font-size: 11px;
+  color: #ffffffcc;
+  margin-top: 2px;
+  text-align: right;
+}
+  .menu-button {
+    background: white;
+    color: #007aff;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    position: absolute;
+    top: 13px;
+    right: 10px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 1000;
+  }
+  .pro-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 999;
+    overflow-y: auto; /* Agar menu bisa di-scroll */
+  }
+  .pro-menu.show {
+    transform: translateX(0);
+  }
+  .pro-menu h3 {
+    margin-top: 0;
+  }
+  .pro-menu input,
+  .pro-menu textarea {
+    width: 100%;
+    margin: 8px 0;
+  }
+  .container {
+    padding: 20px;
+  }
+  select, input, button {
+    width: 100%;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .struk {
+    background: white;
+    padding: 15px;
+    border: 1px dashed #aaa;
+    position: relative;
+    margin-top: 20px;
+  }
+  .struk .watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    opacity: 0.05;
+    font-size: 40px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .struk .watermark img {
+    max-height: 60px;
+    vertical-align: middle;
+  }
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .promo {
+    font-size: 12px;
+    margin-top: 10px;
+    color: #555;
+    border-top: 1px dashed #ccc;
+    padding-top: 8px;
+  }
+  #dukunganWrapper {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+  }
+  #dukunganWrapper img {
+    max-width: 80%;
+  }
+  .theme-toggle {
+    margin: 10px 0;
+    padding: 10px;
+    cursor: pointer;
+  }
+  body.dark {
+    background: #111;
+    color: #eee;
+  }
+  body.dark .struk {
+    background: #222;
+    border-color: #555;
+  }
+</style>
+</head>
+<body><header>
+  <div>
+    <h2 style="margin:0">Struk Pembayaran</h2>
+    <div class="watermark-email">By: bankragilgunawan@gmail.com</div>
+  </div>
+  <div class="menu-button" onclick="toggleMenu()">☰</div>
+</header>
+  <div class="pro-menu" id="proMenu">
+    <h3>Menu Pro</h3>
+    <button class="theme-toggle" onclick="toggleTheme()">Mode 🌙</button>
+    <p><b>Hapus Watermark Judul</b></p>
+<button class="theme-toggle" onclick="toggleWatermarkEmail()">YES</button>
+    <p><b>Logo Struk</b></p>
+    <input type="file" onchange="uploadLogoStruk(event)">
+    <p><b>Logo Watermark</b></p>
+    <input type="file" onchange="uploadLogo(event)">
+    <p><b>Text Watermark</b></p>
+    <input type="text" oninput="window.watermarkText = this.value">
+    <p><b>Promosi di bawah struk</b></p>
+    <textarea oninput="window.promoText = this.value"></textarea>
+    <p><b>Dukung Kami</b></p>
+<button onclick="toggleDukungan()">💖 Dukung Kami</button>
+
+<!-- Tambahan tombol reset akses -->
+<button onclick="localStorage.removeItem('aksesMenuPro'); alert('Akses dikunci ulang')">🔒 Kunci Ulang</button>
+
+<div id="dukunganWrapper">
+  <img id="qrImg" src="https://bankragilgunawan.wordpress.com/wp-content/uploads/2025/07/qr_id1022179552362_212568280075316339689.jpeg" alt="QR Code">
+  <br>
+  <button onclick="downloadQR()">📥 Unduh QR Code</button>
+  <br><br>
+  <a href="https://trakteer.id/bankragilgunawan/tip" target="_blank">
+    <button>💝 Dukung Langsung</button>
+  </a>
+</div>
+  </div>
+  </div>
+  <div class="container">
+    <select id="jenis" onchange="tampilkanForm()">
+      <option value="">-- Pilih Transaksi --</option>
+      <option value="transfer">Transfer</option>
+      <option value="produk">Produk Digital</option>
+      <option value="ppob">PPOB</option>
+    </select>
+    <div id="formInput"></div>
+    <div id="hasilStruk" class="struk"></div>
+    <div class="actions">
+      <button onclick="downloadStruk()">📥 Download</button>
+      <button onclick="kirimWA()">📤 Kirim WA</button>
+      <button onclick="hapusStruk()">🗑️ Hapus</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1"></script>
+<script>
+  const kodeAkses = "1234"; // ubah jika ingin kode lain
+  let menuOpen = false;
+
+  window.logoUrl = "";
+  window.logoStruk = "";
+  window.watermarkText = "WATERMARK ANDA";
+  window.promoText = "Ragil Payment menerima jasa transfer semua bank, Isi pulsa, topup eWallet dll\n0816308466";
+
+  function toggleMenu() {
+  if (!menuOpen) {
+    const sudahAkses = localStorage.getItem("aksesMenuPro");
+
+    if (sudahAkses !== "sudah") {
+      const inputKode = prompt("Masukkan kode akses:");
+      if (inputKode !== kodeAkses) {
+        if (confirm("Kode akses salah!\n\nKlik OK untuk hubungi WhatsApp,\nCancel untuk keluar.")) {
+          window.location.href = "https://wa.me/62816308466?text=Halo,%20saya%20ingin%20minta%20kode%20akses%20menu%20PRO";
+        }
+        return;
+      }
+      localStorage.setItem("aksesMenuPro", "sudah");
+    }
+  }
+
+  menuOpen = !menuOpen;
+  document.getElementById('proMenu').classList.toggle('show', menuOpen);
+  document.querySelector('.menu-button').textContent = menuOpen ? '×' : '☰';
+}
+
+  function toggleTheme() {
+    document.body.classList.toggle('dark');
+  }
+  
+function toggleWatermarkEmail() {
+  const emailEl = document.querySelector('.watermark-email');
+  const btn = event.target;
+
+  if (emailEl) {
+    const hidden = emailEl.style.visibility === 'hidden';
+    emailEl.style.visibility = hidden ? 'visible' : 'hidden';
+    btn.textContent = hidden ? 'YES' : 'NO';
+  }
+}
+
+  function toggleDukungan() {
+    const d = document.getElementById('dukunganWrapper');
+    d.style.display = d.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function uploadLogo(event) {
+    const reader = new FileReader();
+    reader.onload = (e) => window.logoUrl = e.target.result;
+    reader.readAsDataURL(event.target.files[0]);
+  }
+
+  function uploadLogoStruk(event) {
+    const reader = new FileReader();
+    reader.onload = (e) => window.logoStruk = e.target.result;
+    reader.readAsDataURL(event.target.files[0]);
+  }
+
+  function tampilkanForm() {
+    let jenis = document.getElementById('jenis').value;
+    let html = '';
+    if (jenis === 'transfer') {
+      html = `
+        <input placeholder="Nama Pengirim" id="pengirim">
+        <input placeholder="Rekening Tujuan" id="rekeningTujuan">
+        <input placeholder="Nama Penerima" id="penerima">
+        <input placeholder="Nominal" id="nominal" oninput="formatRupiah(this)">
+        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)">
+        <button onclick="buatStruk('transfer')">Buat Struk</button>`;
+    } else if (jenis === 'produk') {
+      html = `
+        <input placeholder="Nomor Tujuan" id="nomorTujuan">
+        <input placeholder="Nama Produk" id="namaProduk">
+        <input placeholder="Harga Produk" id="hargaProduk" oninput="formatRupiah(this)">
+        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)">
+        <button onclick="buatStruk('produk')">Buat Struk</button>`;
+    } else if (jenis === 'ppob') {
+      html = `
+        <input placeholder="Layanan (PDAM, BPJS)" id="layanan">
+        <input placeholder="ID Pelanggan" id="idPelanggan">
+        <input placeholder="Nama Pelanggan" id="namaPelanggan">
+        <input placeholder="Jumlah Tagihan" id="tagihan" oninput="formatRupiah(this)">
+        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)">
+        <button onclick="buatStruk('ppob')">Buat Struk</button>`;
+    }
+    document.getElementById('formInput').innerHTML = html;
+  }
+
+  function formatRupiah(el) {
+    let v = el.value.replace(/\D/g, '');
+    el.value = new Intl.NumberFormat('id-ID').format(v);
+  }
+
+  function buatStruk(jenis) {
+    const now = new Date();
+    const ref = 'TRX' + Math.floor(Math.random() * 1000000);
+    const tgl = now.toLocaleDateString('id-ID');
+    const jam = now.toLocaleTimeString('id-ID');
+    let isi = `<div class="watermark">`;
+    if (window.logoUrl) isi += `<img src="${window.logoUrl}">`;
+    isi += `<div>${window.watermarkText}</div></div>`;
+
+    if (window.logoStruk) {
+      isi += `<div style="text-align:center;"><img src="${window.logoStruk}" alt="Logo Struk" style="max-height:60px;"></div>`;
+    } else {
+      isi += `<h3 style="text-align:center;">RAGIL PAYMENT</h3>`;
+    }
+
+    isi += `<p><strong>ID Transaksi:</strong> ${ref}</p>
+      <p><strong>Tanggal:</strong> ${tgl}</p>
+      <p><strong>Waktu:</strong> ${jam}</p>
+      <hr>`;
+
+    let admin = 0, total = 0;
+
+    if (jenis === 'transfer') {
+      let nominal = getNumber('nominal');
+      admin = getNumber('admin');
+      total = nominal + admin;
+      isi += `<p><strong>Jenis:</strong> Transfer</p>
+        <p><strong>Dari:</strong> ${val('pengirim')}</p>
+        <p><strong>Ke:</strong> ${val('penerima')} (${val('rekeningTujuan')})</p>
+        <p><strong>Nominal:</strong> Rp ${toIDR(nominal)}</p>
+        <p><strong>Biaya Admin:</strong> Rp ${toIDR(admin)}</p>
+        <p><strong>Total Bayar:</strong> <b>Rp ${toIDR(total)}</b></p>`;
+    } else if (jenis === 'produk') {
+      let harga = getNumber('hargaProduk');
+      admin = getNumber('admin');
+      total = harga + admin;
+      isi += `<p><strong>Jenis:</strong> Produk Digital</p>
+        <p><strong>Tujuan:</strong> ${val('nomorTujuan')}</p>
+        <p><strong>Produk:</strong> ${val('namaProduk')}</p>
+        <p><strong>Harga:</strong> Rp ${toIDR(harga)}</p>
+        <p><strong>Biaya Admin:</strong> Rp ${toIDR(admin)}</p>
+        <p><strong>Total Bayar:</strong> <b>Rp ${toIDR(total)}</b></p>`;
+    } else if (jenis === 'ppob') {
+      let tagihan = getNumber('tagihan');
+      admin = getNumber('admin');
+      total = tagihan + admin;
+      isi += `<p><strong>Jenis:</strong> PPOB (${val('layanan')})</p>
+        <p><strong>ID Pelanggan:</strong> ${val('idPelanggan')}</p>
+        <p><strong>Nama:</strong> ${val('namaPelanggan')}</p>
+        <p><strong>Jumlah Tagihan:</strong> Rp ${toIDR(tagihan)}</p>
+        <p><strong>Biaya Admin:</strong> Rp ${toIDR(admin)}</p>
+        <p><strong>Total Bayar:</strong> <b>Rp ${toIDR(total)}</b></p>`;
+    }
+
+    isi += `<p class="status">✅ Berhasil</p>`;
+    isi += `<div class="promo">${window.promoText.replace(/\n/g, '<br>')}</div>`;
+
+    document.getElementById('hasilStruk').innerHTML = isi;
+  }
+
+  const val = id => document.getElementById(id)?.value || '';
+  const getNumber = id => parseInt(val(id).replace(/\D/g, '')) || 0;
+  const toIDR = n => new Intl.NumberFormat('id-ID').format(n);
+
+  function downloadStruk() {
+    html2canvas(document.getElementById("hasilStruk")).then(canvas => {
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL();
+      a.download = "struk.png";
+      a.click();
+    });
+  }
+
+  function kirimWA() {
+    const isi = document.getElementById('hasilStruk').innerText;
+    const link = `https://wa.me/?text=${encodeURIComponent(isi)}`;
+    window.open(link, '_blank');
+  }
+
+  function hapusStruk() {
+    document.getElementById('hasilStruk').innerHTML = "";
+  }
+
+  function downloadQR() {
+    const link = document.createElement('a');
+    link.href = document.getElementById('qrImg').src;
+    link.download = 'dukungan-qr.png';
+    link.click();
+  }
+</script>
+</body>
+</html>
