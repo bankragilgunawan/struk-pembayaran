@@ -141,8 +141,8 @@
   </div>
   <div class="menu-button" onclick="toggleMenu()">☰</div>
 </header>
-  <div class="pro-menu" id="proMenu">
-    <h3>Menu Pro</h3>
+  <div id="proMenu" class="pro-menu" style="padding-bottom: 100px;">
+          <h3>Menu Pro</h3>
     <button class="theme-toggle" onclick="toggleTheme()">Mode 🌙</button>
     <p><b>Hapus Watermark Judul</b></p>
 <button class="theme-toggle" onclick="toggleWatermarkEmail()">YES</button>
@@ -161,7 +161,7 @@
 <button onclick="localStorage.removeItem('aksesMenuPro'); alert('Akses dikunci ulang')">🔒 Kunci Ulang</button>
 
 <div id="dukunganWrapper">
-  <img id="qrImg" src="https://bankragilgunawan.wordpress.com/wp-content/uploads/2025/07/qr_id1022179552362_212568280075316339689.jpeg" alt="QR Code">
+  <img id="qrImg" src="https://bankragilgunawan.wordpress.com/wp-content/uploads/2025/07/img_20250703_2023407111506766525244392.jpg" alt="QR Code">
   <br>
   <button onclick="downloadQR()">📥 Unduh QR Code</button>
   <br><br>
@@ -186,9 +186,8 @@
       <button onclick="hapusStruk()">🗑️ Hapus</button>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1"></script>
 <script>
-  const kodeAkses = "1234"; // ubah jika ingin kode lain
+  const kodeAkses = "1234";
   let menuOpen = false;
 
   window.logoUrl = "";
@@ -197,40 +196,38 @@
   window.promoText = "Ragil Payment menerima jasa transfer semua bank, Isi pulsa, topup eWallet dll\n0816308466";
 
   function toggleMenu() {
-  if (!menuOpen) {
-    const sudahAkses = localStorage.getItem("aksesMenuPro");
-
-    if (sudahAkses !== "sudah") {
-      const inputKode = prompt("Masukkan kode akses:");
-      if (inputKode !== kodeAkses) {
-        if (confirm("Kode akses salah!\n\nKlik OK untuk hubungi WhatsApp,\nCancel untuk keluar.")) {
-          window.location.href = "https://wa.me/62816308466?text=Halo,%20saya%20ingin%20minta%20kode%20akses%20menu%20PRO";
+    if (!menuOpen) {
+      const sudahAkses = localStorage.getItem("aksesMenuPro");
+      if (sudahAkses !== "sudah") {
+        const inputKode = prompt("Masukkan kode akses:");
+        if (inputKode !== kodeAkses) {
+          if (confirm("Kode akses salah!\n\nKlik OK untuk hubungi WhatsApp,\nCancel untuk keluar.")) {
+            window.location.href = "https://wa.me/62816308466?text=Halo,%20saya%20ingin%20minta%20kode%20akses%20menu%20PRO";
+          }
+          return;
         }
-        return;
+        localStorage.setItem("aksesMenuPro", "sudah");
       }
-      localStorage.setItem("aksesMenuPro", "sudah");
     }
-  }
 
-  menuOpen = !menuOpen;
-  document.getElementById('proMenu').classList.toggle('show', menuOpen);
-  document.querySelector('.menu-button').textContent = menuOpen ? '×' : '☰';
-}
+    menuOpen = !menuOpen;
+    document.getElementById('proMenu').classList.toggle('show', menuOpen);
+    document.querySelector('.menu-button').textContent = menuOpen ? '×' : '☰';
+  }
 
   function toggleTheme() {
     document.body.classList.toggle('dark');
   }
-  
-function toggleWatermarkEmail() {
-  const emailEl = document.querySelector('.watermark-email');
-  const btn = event.target;
 
-  if (emailEl) {
-    const hidden = emailEl.style.visibility === 'hidden';
-    emailEl.style.visibility = hidden ? 'visible' : 'hidden';
-    btn.textContent = hidden ? 'YES' : 'NO';
+  function toggleWatermarkEmail() {
+    const emailEl = document.querySelector('.watermark-email');
+    const btn = event.target;
+    if (emailEl) {
+      const hidden = emailEl.style.visibility === 'hidden';
+      emailEl.style.visibility = hidden ? 'visible' : 'hidden';
+      btn.textContent = hidden ? 'YES' : 'NO';
+    }
   }
-}
 
   function toggleDukungan() {
     const d = document.getElementById('dukunganWrapper');
@@ -250,34 +247,46 @@ function toggleWatermarkEmail() {
   }
 
   function tampilkanForm() {
-    let jenis = document.getElementById('jenis').value;
-    let html = '';
-    if (jenis === 'transfer') {
-      html = `
-        <input placeholder="Nama Pengirim" id="pengirim">
-        <input placeholder="Rekening Tujuan" id="rekeningTujuan">
-        <input placeholder="Nama Penerima" id="penerima">
-        <input placeholder="Nominal" id="nominal" oninput="formatRupiah(this)">
-        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)">
-        <button onclick="buatStruk('transfer')">Buat Struk</button>`;
-    } else if (jenis === 'produk') {
-      html = `
-        <input placeholder="Nomor Tujuan" id="nomorTujuan">
-        <input placeholder="Nama Produk" id="namaProduk">
-        <input placeholder="Harga Produk" id="hargaProduk" oninput="formatRupiah(this)">
-        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)">
-        <button onclick="buatStruk('produk')">Buat Struk</button>`;
-    } else if (jenis === 'ppob') {
-      html = `
-        <input placeholder="Layanan (PDAM, BPJS)" id="layanan">
-        <input placeholder="ID Pelanggan" id="idPelanggan">
-        <input placeholder="Nama Pelanggan" id="namaPelanggan">
-        <input placeholder="Jumlah Tagihan" id="tagihan" oninput="formatRupiah(this)">
-        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)">
-        <button onclick="buatStruk('ppob')">Buat Struk</button>`;
-    }
-    document.getElementById('formInput').innerHTML = html;
+  let jenis = document.getElementById('jenis').value;
+  let html = '';
+
+  const inputStyle = 'style="width: 100%; padding: 8px; box-sizing: border-box;"';
+  const wrapperStart = '<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">';
+  const wrapperEnd = '</div>';
+
+  if (jenis === 'transfer') {
+    html = `
+      ${wrapperStart}
+        <input placeholder="Nama Pengirim" id="pengirim" ${inputStyle}>
+        <input placeholder="Rekening Tujuan" id="rekeningTujuan" ${inputStyle}>
+        <input placeholder="Nama Penerima" id="penerima" ${inputStyle}>
+        <input placeholder="Nominal" id="nominal" oninput="formatRupiah(this)" ${inputStyle}>
+        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)" ${inputStyle}>
+        <button onclick="buatStruk('transfer')" style="padding:10px;">Buat Struk</button>
+      ${wrapperEnd}`;
+  } else if (jenis === 'produk') {
+    html = `
+      ${wrapperStart}
+        <input placeholder="Nomor Tujuan" id="nomorTujuan" ${inputStyle}>
+        <input placeholder="Nama Produk" id="namaProduk" ${inputStyle}>
+        <input placeholder="Harga Produk" id="hargaProduk" oninput="formatRupiah(this)" ${inputStyle}>
+        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)" ${inputStyle}>
+        <button onclick="buatStruk('produk')" style="padding:10px;">Buat Struk</button>
+      ${wrapperEnd}`;
+  } else if (jenis === 'ppob') {
+    html = `
+      ${wrapperStart}
+        <input placeholder="Layanan (PDAM, BPJS)" id="layanan" ${inputStyle}>
+        <input placeholder="ID Pelanggan" id="idPelanggan" ${inputStyle}>
+        <input placeholder="Nama Pelanggan" id="namaPelanggan" ${inputStyle}>
+        <input placeholder="Jumlah Tagihan" id="tagihan" oninput="formatRupiah(this)" ${inputStyle}>
+        <input placeholder="Biaya Admin" id="admin" oninput="formatRupiah(this)" ${inputStyle}>
+        <button onclick="buatStruk('ppob')" style="padding:10px;">Buat Struk</button>
+      ${wrapperEnd}`;
   }
+
+  document.getElementById('formInput').innerHTML = html;
+}
 
   function formatRupiah(el) {
     let v = el.value.replace(/\D/g, '');
@@ -289,9 +298,29 @@ function toggleWatermarkEmail() {
     const ref = 'TRX' + Math.floor(Math.random() * 1000000);
     const tgl = now.toLocaleDateString('id-ID');
     const jam = now.toLocaleTimeString('id-ID');
+
+    let admin = 0, total = 0;
     let isi = `<div class="watermark">`;
     if (window.logoUrl) isi += `<img src="${window.logoUrl}">`;
     isi += `<div>${window.watermarkText}</div></div>`;
+
+    // Simpan riwayat
+    const data = JSON.parse(localStorage.getItem("riwayatStruk") || "[]");
+
+let nominal = 0;
+if (jenis === 'transfer') nominal = getNumber('nominal');
+else if (jenis === 'produk') nominal = getNumber('hargaProduk');
+else if (jenis === 'ppob') nominal = getNumber('tagihan');
+
+data.push({
+  id: ref,
+  tgl,
+  jam,
+  admin: getNumber('admin'),
+  nominal: nominal,
+  jenis
+});
+localStorage.setItem("riwayatStruk", JSON.stringify(data));
 
     if (window.logoStruk) {
       isi += `<div style="text-align:center;"><img src="${window.logoStruk}" alt="Logo Struk" style="max-height:60px;"></div>`;
@@ -303,8 +332,6 @@ function toggleWatermarkEmail() {
       <p><strong>Tanggal:</strong> ${tgl}</p>
       <p><strong>Waktu:</strong> ${jam}</p>
       <hr>`;
-
-    let admin = 0, total = 0;
 
     if (jenis === 'transfer') {
       let nominal = getNumber('nominal');
@@ -340,7 +367,6 @@ function toggleWatermarkEmail() {
 
     isi += `<p class="status">✅ Berhasil</p>`;
     isi += `<div class="promo">${window.promoText.replace(/\n/g, '<br>')}</div>`;
-
     document.getElementById('hasilStruk').innerHTML = isi;
   }
 
@@ -373,6 +399,305 @@ function toggleWatermarkEmail() {
     link.download = 'dukungan-qr.png';
     link.click();
   }
+
+  function bukaMenuDock(menu) {
+    const sudahAkses = localStorage.getItem("aksesMenuPro");
+    if (sudahAkses !== "sudah") {
+      const inputKode = prompt("Masukkan kode akses:");
+      if (inputKode !== kodeAkses) {
+        if (confirm("Kode salah! Hubungi WhatsApp?")) {
+          window.location.href = "https://wa.me/62816308466?text=Halo,%20saya%20ingin%20minta%20kode%20akses%20menu%20dock";
+        }
+        return;
+      }
+      localStorage.setItem("aksesMenuPro", "sudah");
+    }
+
+    const panel = document.getElementById("panelDock");
+    const isi = document.getElementById("isiPanelDock");
+    panel.style.display = "block";
+
+    if (menu === 'akun') {
+  const nama = localStorage.getItem("namaPengguna") || "Belum Diisi";
+  const id = localStorage.getItem("idPengguna") || "Belum Diisi";
+  const bio = localStorage.getItem("bioPengguna") || "Tidak ada bio.";
+  const foto = localStorage.getItem("fotoPengguna");
+
+  isi.innerHTML = `
+    <div style="
+      max-width: 300px;
+      margin: 0 auto;
+      background: #f9f9f9;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      font-family: 'Arial', sans-serif;
+    ">
+      <img src="${foto || 'https://i.ibb.co/0cPbz3x/profile.png'}" style="
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #007aff;
+        margin-bottom: 10px;
+      ">
+      <h3 style="margin: 5px 0;">${nama}</h3>
+      <p style="margin: 5px 0; font-size: 13px; color: #666;"><b>ID:</b> ${id}</p>
+      <p style="margin-top: 10px; font-size: 14px; color: #444;">${bio}</p>
+    </div>
+  `;
+} else if (menu === 'riwayat') {
+  const data = JSON.parse(localStorage.getItem("riwayatStruk") || "[]");
+
+  isi.innerHTML = `
+    <h3>📜 Riwayat Transaksi</h3>
+    <select id="filterRiwayat" onchange="tampilkanRiwayatFilter()"
+      style="width:100%; padding:8px; border-radius:8px; margin-bottom:10px;">
+      <option value="semua">Semua</option>
+      <option value="bulanan">Bulanan</option>
+      <option value="mingguan">Mingguan</option>
+    </select>
+    <div id="listRiwayat"></div>
+  `;
+
+  tampilkanRiwayatFilter(data);
+} else if (menu === 'profit') {
+  const data = JSON.parse(localStorage.getItem("riwayatStruk") || "[]");
+
+  isi.innerHTML = `
+    <h3>📈 Laporan Keuangan</h3>
+    <select id="filterProfit" onchange="tampilkanProfitFilter()"
+      style="width:100%; padding:8px; border-radius:8px; margin-bottom:10px;">
+      <option value="semua">Semua</option>
+      <option value="bulanan">Bulanan</option>
+      <option value="mingguan">Mingguan</option>
+    </select>
+    <div id="ringkasanProfit"></div>
+  `;
+
+  tampilkanProfitFilter(data);
+} else if (menu === 'pengaturan') {
+  const nama = localStorage.getItem("namaPengguna") || "";
+  const id = localStorage.getItem("idPengguna") || "";
+  const bio = localStorage.getItem("bioPengguna") || "";
+
+  isi.innerHTML = `
+    <h3>⚙️ Pengaturan</h3>
+
+    <div style="margin-bottom:20px;">
+      <h4>Edit Profil Pengguna</h4>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <label>Nama:
+          <input id="editNama" value="${nama}" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+        </label>
+        <label>ID Pengguna:
+          <input id="editId" value="${id}" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+        </label>
+        <label>Bio:
+          <textarea id="editBio" rows="3" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">${bio}</textarea>
+        </label>
+        <label>Foto Profil:
+          <input type="file" accept="image/*" onchange="uploadFotoProfil(event)">
+        </label>
+        <button onclick="simpanProfil()" style="
+          padding:10px;
+          background:#007aff;
+          color:white;
+          border:none;
+          border-radius:8px;
+          font-weight:bold;
+          cursor:pointer;
+        ">💾 Simpan Profil</button>
+      </div>
+    </div>
+
+    <hr style="margin:20px 0;">
+
+    <button onclick="localStorage.removeItem('aksesMenuPro'); alert('Akses dikunci ulang')">🔒 Kunci Ulang Akses</button>
+    <br><br>
+    <button onclick="localStorage.removeItem('riwayatStruk'); alert('Riwayat dihapus')">🗑️ Hapus Riwayat</button>
+  `;
+}
+}
+</script>
+
+<!-- Dock bawah seperti iPhone (warna senada pengaturan) -->
+<div id="dock" style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fafafa;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  z-index: 999;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: #007aff; /* Warna utama */
+">
+
+  <!-- Menu Profil -->
+  <div onclick="bukaMenuDock('akun')" style="display:flex; flex-direction:column; align-items:center; flex:1; cursor:pointer; color:inherit;">
+    <div style="font-size:24px;">👤</div>
+    <div style="margin-top:2px;">Profil</div>
+  </div>
+
+  <!-- Menu Riwayat -->
+  <div onclick="bukaMenuDock('riwayat')" style="display:flex; flex-direction:column; align-items:center; flex:1; cursor:pointer; color:inherit;">
+    <div style="font-size:24px;">📜</div>
+    <div style="margin-top:2px;">Riwayat</div>
+  </div>
+
+  <!-- Menu Profit -->
+  <div onclick="bukaMenuDock('profit')" style="display:flex; flex-direction:column; align-items:center; flex:1; cursor:pointer; color:inherit;">
+    <div style="font-size:24px;">📈</div>
+    <div style="margin-top:2px;">Profit</div>
+  </div>
+
+  <!-- Menu Pengaturan -->
+  <div onclick="bukaMenuDock('pengaturan')" style="display:flex; flex-direction:column; align-items:center; flex:1; cursor:pointer; color:inherit;">
+    <div style="font-size:24px;">⚙️</div>
+    <div style="margin-top:2px;">Pengaturan</div>
+  </div>
+</div>
+
+<!-- Panel Dock (fullscreen + tombol keluar elegan) -->
+<div id="panelDock" style="
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 20px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 -3px 10px rgba(0,0,0,0.2);
+">
+  <!-- Tombol keluar melayang -->
+  <button onclick="document.getElementById('panelDock').style.display = 'none'"
+    style="
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      font-size: 32px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      color: #e74c3c;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1001;
+    ">×</button>
+
+  <!-- Isi konten menu -->
+  <div id="isiPanelDock" style="margin-top: 60px;"></div>
+</div>
+<script>
+function tampilkanRiwayatFilter(dataRaw) {
+  const data = dataRaw || JSON.parse(localStorage.getItem("riwayatStruk") || "[]");
+  const filter = document.getElementById("filterRiwayat").value;
+  const now = new Date();
+
+  let hasil = "";
+
+  const filtered = data.filter(d => {
+    const [tgl, bln, thn] = d.tgl.split('/');
+    const tglObj = new Date(`${thn}-${bln.padStart(2, '0')}-${tgl.padStart(2, '0')}`);
+
+    if (filter === "bulanan") {
+      return tglObj.getMonth() === now.getMonth() && tglObj.getFullYear() === now.getFullYear();
+    } else if (filter === "mingguan") {
+      const selisih = Math.floor((now - tglObj) / (1000 * 60 * 60 * 24));
+      return selisih <= 7;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    hasil = "<p style='color:#999;'>Tidak ada transaksi pada periode ini.</p>";
+  } else {
+    hasil = filtered.map(d => `
+      <div style="
+        background: #fff;
+        border-radius: 12px;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        font-size: 14px;
+      ">
+        <div style="font-weight:bold; color:#007aff;">${(d.jenis || 'TRANSAKSI').toUpperCase()}</div>
+        <div style="color:#333;">ID: ${d.id}</div>
+        <div style="color:#777;">Tanggal: ${d.tgl}</div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById("listRiwayat").innerHTML = hasil;
+}
+
+function tampilkanProfitFilter(dataRaw) {
+  const data = dataRaw || JSON.parse(localStorage.getItem("riwayatStruk") || "[]");
+  const filter = document.getElementById("filterProfit").value;
+  const now = new Date();
+
+  let filtered = data.filter(d => {
+    const [tgl, bln, thn] = d.tgl.split('/');
+    const tglObj = new Date(`${thn}-${bln.padStart(2, '0')}-${tgl.padStart(2, '0')}`);
+    if (filter === "bulanan") {
+      return tglObj.getMonth() === now.getMonth() && tglObj.getFullYear() === now.getFullYear();
+    } else if (filter === "mingguan") {
+      const selisih = Math.floor((now - tglObj) / (1000 * 60 * 60 * 24));
+      return selisih <= 7;
+    }
+    return true;
+  });
+
+  let totalLaba = 0;
+  let totalProfit = 0;
+
+  filtered.forEach(d => {
+    totalProfit += d.admin || 0;
+    // Estimasi laba total dari nominal (tidak disimpan, jadi hanya estimasi 10x admin)
+    totalLaba += (d.nominal || (d.admin * 10 || 0)) + (d.admin || 0);
+  });
+
+  document.getElementById("ringkasanProfit").innerHTML = `
+    <div style="
+      background:#fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+      text-align:center;
+    ">
+      <h4 style="margin:0;">📊 Informasi Laba</h4>
+      <p style="font-size:22px; color:#28a745; margin:5px 0;">Rp ${toIDR(totalLaba)}</p>
+      <hr style="border:none; border-top:1px solid #ddd; margin:15px 0;">
+      <h4 style="margin:0;">💰 Informasi Profit</h4>
+      <p style="font-size:20px; color:#007aff; margin:5px 0;">Rp ${toIDR(totalProfit)}</p>
+      <p style="font-size:12px; color:#888;">*Profit dihitung dari total biaya admin</p>
+    </div>
+  `;
+}
+function simpanProfil() {
+  localStorage.setItem("namaPengguna", document.getElementById("editNama").value);
+  localStorage.setItem("idPengguna", document.getElementById("editId").value);
+  localStorage.setItem("bioPengguna", document.getElementById("editBio").value);
+  alert("Profil berhasil disimpan! Silakan buka menu Profil.");
+}
+
+function uploadFotoProfil(event) {
+  const reader = new FileReader();
+  reader.onload = (e) => localStorage.setItem("fotoPengguna", e.target.result);
+  reader.readAsDataURL(event.target.files[0]);
+}
 </script>
 </body>
 </html>
